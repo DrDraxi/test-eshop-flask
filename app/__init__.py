@@ -32,8 +32,11 @@ def create_app():
     # Import models so they are registered with SQLAlchemy
     from app import models  # noqa: F401
 
-    # Create database tables
+    # Create database tables (skip if they already exist)
     with app.app_context():
-        db.create_all()
+        from sqlalchemy import inspect
+        inspector = inspect(db.engine)
+        if not inspector.get_table_names():
+            db.create_all()
 
     return app
