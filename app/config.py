@@ -9,6 +9,8 @@ class Config:
     _db_url = os.getenv("DATABASE_URL", "sqlite:///dev.db")
     if _db_url.startswith("postgres://"):
         _db_url = _db_url.replace("postgres://", "postgresql://", 1)
+    elif _db_url.startswith("file:"):
+        _db_url = "sqlite:///" + _db_url[len("file:"):]
     SQLALCHEMY_DATABASE_URI = _db_url
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "admin123")
