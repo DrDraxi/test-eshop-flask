@@ -22,7 +22,7 @@ uploads/
 
 # Node / Tailwind
 node_modules/
-app/static/css/output.css
+# app/static/css/output.css  -- included for Railway deployment
 
 # IDE
 .vscode/
