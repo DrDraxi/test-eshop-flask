@@ -1,0 +1,33 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Settings{% endblock %}
+{% block content %}
+<div class="max-w-2xl">
+    <h1 class="text-3xl font-bold mb-6">Shop Settings</h1>
+    <form method="POST">
+        <div class="card">
+            <div class="card-header"><h2 class="card-title">General</h2></div>
+            <div class="card-content space-y-4">
+                <div class="space-y-2">
+                    <label class="label" for="shop_name">Shop Name</label>
+                    <input class="input" id="shop_name" name="shop_name" value="{{ settings.shop_name }}">
+                </div>
+                <div class="space-y-2">
+                    <label class="label" for="description">Description</label>
+                    <input class="input" id="description" name="description" value="{{ settings.description }}">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                        <label class="label" for="currency">Currency</label>
+                        <input class="input" id="currency" name="currency" value="{{ settings.currency }}" placeholder="usd">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="label" for="shipping_fee">Shipping Fee (cents)</label>
+                        <input class="input" type="number" min="0" id="shipping_fee" name="shipping_fee" value="{{ settings.shipping_fee }}">
+                    </div>
+                </div>
+                <button type="submit" class="btn-primary">Save Settings</button>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}

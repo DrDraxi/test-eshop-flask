@@ -1,0 +1,169 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}{{ "Edit" if product else "New" }} Product{% endblock %}
+{% block content %}
+<div class="max-w-2xl">
+    <div class="card">
+        <div class="card-header">
+            <h1 class="card-title">{{ "Edit Product" if product else "New Product" }}</h1>
+        </div>
+        <div class="card-content">
+            <form id="product-form" class="space-y-4">
+                <!-- Name + Slug (2-col grid) -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                        <label class="label" for="name">Name</label>
+                        <input class="input" id="name" value="{{ product.name if product else '' }}" required>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="label" for="slug">Slug</label>
+                        <input class="input" id="slug" value="{{ product.slug if product else '' }}" required>
+                    </div>
+                </div>
+
+                <!-- Description -->
+                <div class="space-y-2">
+                    <label class="label" for="description">Description</label>
+                    <textarea class="textarea" id="description" rows="4">{{ product.description if product else '' }}</textarea>
+                </div>
+
+                <!-- Price + Stock + Category (3-col grid) -->
+                <div class="grid grid-cols-3 gap-4">
+                    <div class="space-y-2">
+                        <label class="label" for="price">Price ($)</label>
+                        <input class="input" type="number" step="0.01" min="0" id="price"
+                               value="{{ '%.2f'|format(product.price / 100) if product else '' }}" required>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="label" for="stock">Stock</label>
+                        <input class="input" type="number" min="0" id="stock"
+                               value="{{ product.stock if product else 0 }}" required>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="label" for="category">Category</label>
+                        <input class="input" id="category" value="{{ product.category if product else '' }}" placeholder="e.g. Figurines">
+                    </div>
+                </div>
+
+                <!-- Visible checkbox -->
+                <div class="flex items-center gap-2">
+                    <input type="checkbox" id="visible" {{ 'checked' if (not product or product.visible) }}>
+                    <label class="label" for="visible">Visible on storefront</label>
+                </div>
+
+                <!-- Images -->
+                <div class="space-y-2">
+                    <label class="label">Images</label>
+                    <div id="image-list" class="flex flex-wrap gap-3">
+                        <!-- Existing images rendered here by JS -->
+                    </div>
+                    <label class="w-24 h-24 border-2 border-dashed rounded flex items-center justify-center cursor-pointer hover:bg-[hsl(var(--muted))]/50 transition-colors inline-flex">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[hsl(var(--muted-foreground))]"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+                        <input type="file" accept="image/*" multiple id="image-upload" class="hidden">
+                    </label>
+                    <p id="upload-status" class="text-sm text-[hsl(var(--muted-foreground))] hidden">Uploading...</p>
+                </div>
+
+                <!-- Buttons -->
+                <div class="flex gap-3 pt-4">
+                    <button type="submit" class="btn-primary" id="submit-btn">
+                        {{ "Update Product" if product else "Create Product" }}
+                    </button>
+                    <a href="/admin/products" class="btn-outline">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Product form JavaScript
+let images = [
+{% if product and product.images %}
+{% for img in product.images %}
+  { "url": {{ img.url|tojson }}, "alt": {{ img.alt|tojson }} }{% if not loop.last %},{% endif %}
+{% endfor %}
+{% endif %}
+];
+
+// Auto-slug from name (only for new products)
+{% if not product %}
+document.getElementById('name').addEventListener('input', function() {
+    document.getElementById('slug').value = this.value.toLowerCase()
+        .replace(/[^\w\s-]/g, '').replace(/[\s_]+/g, '-').replace(/^-+|-+$/g, '');
+});
+{% endif %}
+
+// Render images
+function renderImages() {
+    const list = document.getElementById('image-list');
+    list.innerHTML = images.map((img, i) => `
+        <div class="relative w-24 h-24 border rounded overflow-hidden group">
+            <img src="${img.url}" alt="${img.alt || ''}" class="w-full h-full object-cover">
+            <button type="button" onclick="removeImage(${i})"
+                class="absolute top-1 right-1 bg-[hsl(var(--destructive))] text-[hsl(var(--destructive-foreground))] rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            </button>
+        </div>
+    `).join('');
+}
+renderImages();
+
+function removeImage(index) {
+    images.splice(index, 1);
+    renderImages();
+}
+
+// Image upload
+document.getElementById('image-upload').addEventListener('change', async function() {
+    const status = document.getElementById('upload-status');
+    status.classList.remove('hidden');
+    for (const file of this.files) {
+        const fd = new FormData();
+        fd.append('file', file);
+        const res = await fetch('/api/upload', { method: 'POST', body: fd });
+        if (res.ok) {
+            const data = await res.json();
+            images.push({ url: data.url, alt: '' });
+        }
+    }
+    status.classList.add('hidden');
+    this.value = '';
+    renderImages();
+});
+
+// Form submit
+document.getElementById('product-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const btn = document.getElementById('submit-btn');
+    btn.disabled = true;
+    btn.textContent = 'Saving...';
+
+    const body = {
+        name: document.getElementById('name').value,
+        slug: document.getElementById('slug').value,
+        description: document.getElementById('description').value,
+        price: Math.round(parseFloat(document.getElementById('price').value) * 100),
+        stock: parseInt(document.getElementById('stock').value),
+        category: document.getElementById('category').value,
+        visible: document.getElementById('visible').checked,
+        images: images,
+    };
+
+    const url = '{{ "/admin/products/" + product.id if product else "/admin/products/new" }}';
+    const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+    });
+
+    if (res.ok) {
+        window.location.href = '/admin/products';
+    } else {
+        btn.disabled = false;
+        btn.textContent = '{{ "Update Product" if product else "Create Product" }}';
+    }
+});
+</script>
+{% endblock %}

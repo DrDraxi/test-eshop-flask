@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Cart - 3D Print Shop{% endblock %}
+{% block content %}
+<div id="cart-page" class="container mx-auto px-4 py-8">
+    <!-- Empty state (shown by default, hidden by JS if cart has items) -->
+    <div id="cart-empty" class="py-16 text-center">
+        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="mx-auto text-[hsl(var(--muted-foreground))] mb-4"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        <h1 class="text-2xl font-bold mb-2">Your cart is empty</h1>
+        <p class="text-[hsl(var(--muted-foreground))] mb-6">Add some products to get started.</p>
+        <a href="/products" class="btn-primary">Browse Products</a>
+    </div>
+
+    <!-- Cart with items (hidden by default, shown by JS) -->
+    <div id="cart-filled" class="hidden">
+        <h1 class="text-3xl font-bold mb-6">Shopping Cart</h1>
+        <div class="grid lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-2 space-y-4" id="cart-items">
+                <!-- Rendered by cart.js -->
+            </div>
+            <div>
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title text-lg">Order Summary</h2>
+                    </div>
+                    <div class="card-content space-y-3">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-[hsl(var(--muted-foreground))]">Subtotal</span>
+                            <span id="cart-subtotal">$0.00</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-[hsl(var(--muted-foreground))]">Shipping</span>
+                            <span class="text-[hsl(var(--muted-foreground))]">Calculated at checkout</span>
+                        </div>
+                        <div class="separator my-2"></div>
+                        <div class="flex justify-between font-bold">
+                            <span>Total</span>
+                            <span id="cart-total">$0.00</span>
+                        </div>
+                        <a href="/checkout" class="btn-primary w-full btn-lg block text-center mt-4">
+                            Proceed to Checkout
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

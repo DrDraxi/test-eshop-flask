@@ -1,0 +1,74 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<h1 class="text-3xl font-bold mb-6">Dashboard</h1>
+
+<!-- Stats Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <!-- Total Revenue -->
+    <div class="card">
+        <div class="card-header flex flex-row items-center justify-between pb-2">
+            <h3 class="text-sm font-medium text-[hsl(var(--muted-foreground))]">Total Revenue</h3>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[hsl(var(--muted-foreground))]"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        </div>
+        <div class="card-content">
+            <div class="text-2xl font-bold">{{ total_revenue|format_price }}</div>
+        </div>
+    </div>
+
+    <!-- Total Orders -->
+    <div class="card">
+        <div class="card-header flex flex-row items-center justify-between pb-2">
+            <h3 class="text-sm font-medium text-[hsl(var(--muted-foreground))]">Total Orders</h3>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[hsl(var(--muted-foreground))]"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+        </div>
+        <div class="card-content">
+            <div class="text-2xl font-bold">{{ order_count }}</div>
+        </div>
+    </div>
+
+    <!-- Pending Orders -->
+    <div class="card">
+        <div class="card-header flex flex-row items-center justify-between pb-2">
+            <h3 class="text-sm font-medium text-[hsl(var(--muted-foreground))]">Pending Orders</h3>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[hsl(var(--muted-foreground))]"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <div class="card-content">
+            <div class="text-2xl font-bold">{{ pending_count }}</div>
+        </div>
+    </div>
+
+    <!-- Products -->
+    <div class="card">
+        <div class="card-header flex flex-row items-center justify-between pb-2">
+            <h3 class="text-sm font-medium text-[hsl(var(--muted-foreground))]">Products</h3>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[hsl(var(--muted-foreground))]"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+        </div>
+        <div class="card-content">
+            <div class="text-2xl font-bold">{{ product_count }}</div>
+        </div>
+    </div>
+</div>
+
+<!-- Low Stock Alerts -->
+{% if low_stock %}
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title text-lg flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[hsl(var(--destructive))]"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+            Low Stock Alerts
+        </h2>
+    </div>
+    <div class="card-content">
+        <div class="space-y-2">
+            {% for product in low_stock %}
+            <div class="flex justify-between items-center text-sm">
+                <span>{{ product.name }}</span>
+                <span class="font-mono text-[hsl(var(--destructive))]">{{ product.stock }} left</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

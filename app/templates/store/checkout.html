@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+{% block title %}Checkout - 3D Print Shop{% endblock %}
+
+{% block head %}
+<script src="https://js.stripe.com/v3/"></script>
+{% if google_places_key %}
+<script src="https://maps.googleapis.com/maps/api/js?key={{ google_places_key }}&libraries=places" async defer></script>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8 max-w-2xl">
+    <h1 class="text-3xl font-bold mb-6">Checkout</h1>
+
+    <!-- Step 1: Shipping -->
+    <div id="shipping-step">
+        <form id="shipping-form" class="space-y-6">
+            <div class="card">
+                <div class="card-header"><h2 class="card-title">Contact Information</h2></div>
+                <div class="card-content space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-2">
+                            <label class="label" for="name">Full Name</label>
+                            <input class="input" id="name" required>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="label" for="email">Email</label>
+                            <input class="input" type="email" id="email" required>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header"><h2 class="card-title">Shipping Address</h2></div>
+                <div class="card-content space-y-4">
+                    <div class="space-y-2">
+                        <label class="label" for="line1">Address Line 1</label>
+                        <input class="input" id="line1" required>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="label" for="line2">Address Line 2 (optional)</label>
+                        <input class="input" id="line2">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-2">
+                            <label class="label" for="city">City</label>
+                            <input class="input" id="city" required>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="label" for="state">State / Province</label>
+                            <input class="input" id="state" required>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-2">
+                            <label class="label" for="postalCode">Postal Code</label>
+                            <input class="input" id="postalCode" required>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="label" for="country">Country</label>
+                            <input class="input" id="country" value="US" required>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header"><h2 class="card-title">Order Summary</h2></div>
+                <div class="card-content">
+                    <div id="checkout-items" class="space-y-2"><!-- Rendered by JS --></div>
+                    <div class="separator my-2"></div>
+                    <div class="flex justify-between font-bold">
+                        <span>Subtotal</span>
+                        <span id="checkout-subtotal">$0.00</span>
+                    </div>
+                </div>
+            </div>
+
+            <p id="shipping-error" class="text-sm text-[hsl(var(--destructive))] hidden"></p>
+
+            <button type="submit" id="shipping-btn" class="btn-primary w-full btn-lg">
+                Continue to Payment
+            </button>
+        </form>
+    </div>
+
+    <!-- Step 2: Payment -->
+    <div id="payment-step" class="hidden">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Payment</h2>
+                <p id="payment-order-number" class="text-sm text-[hsl(var(--muted-foreground))]"></p>
+            </div>
+            <div class="card-content space-y-4">
+                <div id="payment-element"><!-- Stripe mounts here --></div>
+                <p id="payment-error" class="text-sm text-[hsl(var(--destructive))] hidden"></p>
+                <button id="pay-btn" class="btn-primary w-full btn-lg">Pay Now</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/stripe.js') }}"></script>
+<script>
+    // Render checkout summary from cart
+    document.addEventListener('DOMContentLoaded', function() {
+        const cart = JSON.parse(localStorage.getItem('cart-items') || '[]');
+        if (cart.length === 0) { window.location.href = '/cart'; return; }
+
+        const itemsDiv = document.getElementById('checkout-items');
+        let subtotal = 0;
+        cart.forEach(item => {
+            subtotal += item.price * item.quantity;
+            const div = document.createElement('div');
+            div.className = 'flex justify-between text-sm';
+            div.innerHTML = `<span>${item.name} x ${item.quantity}</span><span>${formatPrice(item.price * item.quantity)}</span>`;
+            itemsDiv.appendChild(div);
+        });
+        document.getElementById('checkout-subtotal').textContent = formatPrice(subtotal);
+
+        // Init address autocomplete if Google Places loaded
+        if (typeof google !== 'undefined' && google.maps && google.maps.places) {
+            initAddressAutocomplete();
+        }
+    });
+
+    function initAddressAutocomplete() {
+        const input = document.getElementById('line1');
+        if (!input) return;
+        const autocomplete = new google.maps.places.Autocomplete(input, { types: ['address'], fields: ['address_components'] });
+        autocomplete.addListener('place_changed', function() {
+            const place = autocomplete.getPlace();
+            if (!place.address_components) return;
+            let streetNumber = '', route = '';
+            place.address_components.forEach(c => {
+                const t = c.types[0];
+                if (t === 'street_number') streetNumber = c.long_name;
+                if (t === 'route') route = c.long_name;
+                if (t === 'locality') document.getElementById('city').value = c.long_name;
+                if (t === 'administrative_area_level_1') document.getElementById('state').value = c.short_name;
+                if (t === 'postal_code') document.getElementById('postalCode').value = c.long_name;
+                if (t === 'country') document.getElementById('country').value = c.short_name;
+            });
+            input.value = (streetNumber + ' ' + route).trim();
+        });
+    }
+
+    // Initialize Stripe checkout
+    initStripeCheckout('{{ stripe_key }}');
+</script>
+{% endblock %}

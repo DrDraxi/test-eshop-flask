@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+env/
+
+# Flask
+instance/
+*.db
+
+# Environment
+.env
+.env.*
+
+# Uploads
+uploads/
+
+# Node / Tailwind
+node_modules/
+app/static/css/output.css
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Misc
+*.log
+.cache/

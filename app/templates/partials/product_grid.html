@@ -1,0 +1,10 @@
+<div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    {% for product in products %}
+    {% include "partials/product_card.html" %}
+    {% endfor %}
+</div>
+{% if not products %}
+<p class="text-center text-[hsl(var(--muted-foreground))] py-12">
+    No products found{% if current_category %} in "{{ current_category }}"{% endif %}.
+</p>
+{% endif %}

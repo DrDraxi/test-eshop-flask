@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - 3D Print Shop</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/output.css') }}">
+</head>
+<body class="min-h-screen flex items-center justify-center bg-[hsl(var(--muted))]/40">
+    <div class="card w-full max-w-sm">
+        <div class="card-header">
+            <h1 class="card-title text-2xl text-center">Admin Login</h1>
+        </div>
+        <div class="card-content">
+            <form method="POST" class="space-y-4">
+                <div class="space-y-2">
+                    <label for="password" class="label">Password</label>
+                    <input
+                        id="password"
+                        name="password"
+                        type="password"
+                        placeholder="Enter admin password"
+                        required
+                        class="input"
+                    >
+                </div>
+                {% if error %}
+                <p class="text-sm text-[hsl(var(--destructive))]">{{ error }}</p>
+                {% endif %}
+                <button type="submit" class="btn-primary w-full">
+                    Log In
+                </button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

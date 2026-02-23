@@ -1,0 +1,9 @@
+{# Expects: status variable #}
+{% if status == "PENDING" %}<span class="badge-outline">Pending</span>
+{% elif status == "PAID" %}<span class="badge-default">Paid</span>
+{% elif status == "SHIPPED" %}<span class="badge-secondary">Shipped</span>
+{% elif status == "DELIVERED" %}<span class="badge-default">Delivered</span>
+{% elif status == "CANCELLED" %}<span class="badge-destructive">Cancelled</span>
+{% elif status == "REFUNDED" %}<span class="badge-destructive">Refunded</span>
+{% else %}<span class="badge-outline">{{ status }}</span>
+{% endif %}

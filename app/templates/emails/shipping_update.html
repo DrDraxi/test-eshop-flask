@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: -apple-system, sans-serif; color: #1a1a2e; margin: 0; padding: 0; background: #f5f5f5; }
+        .container { max-width: 600px; margin: 0 auto; background: #fff; }
+        .header { background: #1a1a2e; color: #fff; padding: 24px; text-align: center; }
+        .content { padding: 24px; }
+        .footer { padding: 24px; text-align: center; color: #888; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 style="margin:0; font-size: 24px;">Your Order Has Shipped!</h1>
+        </div>
+        <div class="content">
+            <p>Hi {{ order.customer_name }},</p>
+            <p>Great news! Your order <strong>#{{ order.order_number }}</strong> has been shipped.</p>
+            <p>Thank you for shopping with us!</p>
+        </div>
+        <div class="footer">
+            <p>3D Print Shop</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,22 @@
+<div id="order-actions">
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title text-lg">Actions</h2>
+        </div>
+        <div class="card-content space-y-4">
+            <form hx-post="/admin/orders/{{ order.id }}/status" hx-target="#order-actions" hx-swap="outerHTML" class="flex items-center gap-3">
+                <select name="status" class="input w-48">
+                    {% for s in ["PENDING", "PAID", "SHIPPED", "DELIVERED", "CANCELLED", "REFUNDED"] %}
+                    <option value="{{ s }}" {{ "selected" if order.status == s }}>{{ s }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="btn-primary btn-sm">Update Status</button>
+            </form>
+            {% if order.status == "PAID" %}
+            <form action="/admin/orders/{{ order.id }}/refund" method="POST" onsubmit="return confirm('Issue a refund?')">
+                <button type="submit" class="btn-destructive">Issue Refund</button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+</div>

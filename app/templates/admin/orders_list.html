@@ -1,0 +1,33 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Orders{% endblock %}
+{% block content %}
+<h1 class="text-3xl font-bold mb-6">Orders</h1>
+<div class="table-wrapper">
+    <table class="styled">
+        <thead>
+            <tr>
+                <th>Order #</th><th>Customer</th><th>Status</th><th>Items</th><th>Total</th><th>Date</th><th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+            <tr>
+                <td class="font-mono text-sm">{{ order.order_number }}</td>
+                <td>
+                    <div>{{ order.customer_name }}</div>
+                    <div class="text-xs text-[hsl(var(--muted-foreground))]">{{ order.customer_email }}</div>
+                </td>
+                <td>{% with status=order.status %}{% include "partials/status_badge.html" %}{% endwith %}</td>
+                <td>{{ order.items|length }}</td>
+                <td>{{ order.total|format_price }}</td>
+                <td class="text-sm">{{ order.created_at.strftime("%Y-%m-%d") }}</td>
+                <td><a href="/admin/orders/{{ order.id }}" class="btn-outline btn-sm">View</a></td>
+            </tr>
+            {% endfor %}
+            {% if not orders %}
+            <tr><td colspan="7" class="text-center text-[hsl(var(--muted-foreground))] py-8">No orders yet.</td></tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

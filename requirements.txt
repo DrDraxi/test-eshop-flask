@@ -1,0 +1,8 @@
+Flask==3.1.*
+Flask-SQLAlchemy==3.1.*
+Flask-Migrate==4.1.*
+Flask-Mail==0.10.*
+stripe==12.*
+python-dotenv==1.1.*
+Pillow==11.*
+gunicorn==23.*

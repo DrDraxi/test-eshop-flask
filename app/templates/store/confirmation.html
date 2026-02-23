@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Order Confirmed - 3D Print Shop{% endblock %}
+{% block content %}
+<div class="container mx-auto px-4 py-16 max-w-lg text-center">
+    <div class="card">
+        <div class="card-header">
+            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mx-auto mb-4 text-green-500"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            <h1 class="card-title text-2xl">Order Confirmed!</h1>
+        </div>
+        <div class="card-content space-y-4">
+            <p class="text-[hsl(var(--muted-foreground))]">
+                Thank you for your purchase. Your order has been placed successfully.
+            </p>
+            {% if order_number %}
+            <p class="font-mono text-lg font-semibold">Order #{{ order_number }}</p>
+            {% endif %}
+            <p class="text-sm text-[hsl(var(--muted-foreground))]">
+                You will receive a confirmation email shortly.
+            </p>
+            <div class="pt-4">
+                <a href="/products" class="btn-primary">Continue Shopping</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+    // Clear cart after successful checkout
+    localStorage.removeItem('cart-items');
+    if (typeof updateCartBadge === 'function') updateCartBadge();
+</script>
+{% endblock %}
